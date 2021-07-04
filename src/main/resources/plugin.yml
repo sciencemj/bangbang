@@ -1,0 +1,6 @@
+name: BangBang
+version: ${project.version}
+main: com.sciecenmj.bangbang.BangBang
+api-version: 1.17
+authors: [ sciencemj ]
+description: gun fight plugin!
