@@ -2,6 +2,7 @@ package com.sciecenmj.bangbang;
 
 import com.sciecenmj.bangbang.gun.GunCool;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -29,54 +30,26 @@ public final class BangBang extends JavaPlugin {
                     if (gunTime.containsKey(p)) {
                         for (GunCool gc : gunTime.get(p)) {
                             if (gc.isCoolDowning()) {
-
-                                if (bossBar.containsKey(p)) {
-                                    BossBar bar = bossBar.get(p);
-                                    bar.setTitle("쿨타임:" + gc.getCCoolDown());
-                                    bar.setColor(BarColor.YELLOW);
-                                    bar.setProgress(((double) gc.getCCoolDown()) / ((double) gc.getCoolDown()));
-                                    bossBar.replace(p, bar);
-                                } else {
-                                    BossBar bar = getServer().createBossBar("", BarColor.YELLOW, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-                                    bar.addPlayer(p);
-                                    bar.setVisible(true);
-                                    bar.setTitle("쿨타임:" + gc.getCCoolDown());
-                                    bar.setProgress(((double) gc.getCCoolDown()) / ((double) gc.getCoolDown()));
-                                    bossBar.put(p, bar);
-                                }
                                 gc.coolDownT(1);
+                                if (gc.isCoolDowning()) {
+                                    changeBossbar(p, ChatColor.YELLOW + "쿨타임:" + gc.getCCoolDown(),
+                                            ((double) gc.getCCoolDown()) / ((double) gc.getCoolDown()), BarColor.YELLOW);
+                                }else {
+                                    changeBossbar(p, "탄수:" + gc.getCurrentBullet(),
+                                            ((double) gc.getCurrentBullet()) / ((double) gc.getBullet()), BarColor.BLUE);
+                                }
                             } else if (gc.isReloading()) {
-
-                                if (bossBar.containsKey(p)) {
-                                    BossBar bar = bossBar.get(p);
-                                    bar.setTitle("재장전:" + gc.getCReloadTime());
-                                    bar.setColor(BarColor.RED);
-                                    bar.setProgress(((double) gc.getCReloadTime()) / ((double) gc.getReloadTime()));
-                                    bossBar.replace(p, bar);
-                                } else {
-                                    BossBar bar = getServer().createBossBar("", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-                                    bar.addPlayer(p);
-                                    bar.setVisible(true);
-                                    bar.setTitle("재장전:" + gc.getCReloadTime());
-                                    bar.setProgress(((double) gc.getCReloadTime()) / ((double) gc.getReloadTime()));
-                                    bossBar.put(p, bar);
-                                }
                                 gc.reloadT(1);
-                            } else {
-                                if (bossBar.containsKey(p)) {
-                                    BossBar bar = bossBar.get(p);
-                                    bar.setTitle("탄수:" + gc.getCurrentBullet());
-                                    bar.setColor(BarColor.BLUE);
-                                    bar.setProgress(((double) gc.getCurrentBullet()) / ((double) gc.getBullet()));
-                                    bossBar.replace(p, bar);
-                                } else {
-                                    BossBar bar = getServer().createBossBar("", BarColor.BLUE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-                                    bar.setTitle("탄수:" + gc.getCurrentBullet());
-                                    bar.addPlayer(p);
-                                    bar.setVisible(true);
-                                    bar.setProgress(((double) gc.getCurrentBullet()) / ((double) gc.getBullet()));
-                                    bossBar.put(p, bar);
+                                if(gc.isReloading()) {
+                                    changeBossbar(p, ChatColor.RED + "재장전:" + gc.getCReloadTime(),
+                                            ((double) gc.getCReloadTime()) / ((double) gc.getReloadTime()), BarColor.RED);
+                                }else {
+                                    changeBossbar(p, "탄수:" + gc.getCurrentBullet(),
+                                            ((double) gc.getCurrentBullet()) / ((double) gc.getBullet()), BarColor.BLUE);
                                 }
+                            } else {
+                                changeBossbar(p, "탄수:" + gc.getCurrentBullet(),
+                                        ((double) gc.getCurrentBullet()) / ((double) gc.getBullet()), BarColor.BLUE);
                             }
                         }
                     }
@@ -88,5 +61,21 @@ public final class BangBang extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+    public void changeBossbar(Player p, String s, Double progress, BarColor color){
+        if (bossBar.containsKey(p)) { //TODO 재장전,쿨타임 처리 cancelingTsk로 옮기기(shot시 새로운 cancelingTask 생성)
+            BossBar bar = bossBar.get(p);
+            bar.setTitle(s);
+            bar.setColor(color);
+            bar.setProgress(progress);
+            bossBar.replace(p, bar);
+        } else {
+            BossBar bar = getServer().createBossBar("", color, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+            bar.setTitle(s);
+            bar.addPlayer(p);
+            bar.setVisible(true);
+            bar.setProgress(progress);
+            bossBar.put(p, bar);
+        }
     }
 }

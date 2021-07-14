@@ -14,6 +14,7 @@ public enum GunType {
     final private String name;
     final private Gun gun;
 
+
     private GunType(String name, Gun gun){
         this.name = name;
         this.gun = gun;
